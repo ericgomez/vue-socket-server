@@ -6,3 +6,10 @@ Express application
 ```bash
 npx express-generator --no-view vue-socket-server
 ```
+
+## Install the dependencies
+```bash
+yarn add bcrypt cors jsonwebtoken mongoose mongoose-unique-validator socket.io socketio-jwt
+# or
+npm install bcrypt cors jsonwebtoken mongoose mongoose-unique-validator socket.io socketio-jwt
+```
