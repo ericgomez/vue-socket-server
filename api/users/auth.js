@@ -47,6 +47,28 @@ router
         message: e.message
       });
     }
+  })
+  .post('/register', async (req, res, next) => {
+    try {
+      const newUser = new User({
+        username: req.body.username,
+        password: req.body.password
+      });
+
+      const dbUser = await newUser.save();
+      const tokenData = { id: dbUser._id, username: dbUser.username };
+      const token = jwt.sign(tokenData, process.env.SECRET_PRIVATE_KEY, { expiresIn: '14d' });
+
+      console.log("new user created!");
+
+      await res.json({
+        token
+      });
+    } catch (e) {
+      await res.status(400).send({
+        message: e.message
+      });
+    }
   });
 
 module.exports = router;
