@@ -1,21 +1,43 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+const { createServer } = require('http');
+const { Server } = require("socket.io");
+const socketioJwt = require('socketio-jwt');
+const cors = require('cors');
 require('./connections/mongodb');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+// sockets
+const Live = require("./sockets/Live");
+const Rooms = require("./sockets/Room");
 
-var app = express();
+const authRouter = require('./routes/auth');
 
-app.use(logger('dev'));
+const app = express();
+const server = createServer(app);
+const io = new Server(server);
+
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/api', authRouter);
+
+io.use(socketioJwt.authorize({
+  secret: process.env.SECRET_PRIVATE_KEY,
+  handshake: true,
+  timeout: 15000
+}));
+
+let countSockets = 0;
+let roomsUsers = {};
+let roomsMessages = {};
+let sockets = {};
+
+io.on('connection', async (socket) => {
+  console.log("Socket connected!");
+});
+
+server.listen(process.env.PORT, () => {
+  console.log(`listening on *:${process.env.PORT}`);
+});
 
 module.exports = app;
