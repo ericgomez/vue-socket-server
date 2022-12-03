@@ -1,6 +1,6 @@
 const express = require('express');
 const { createServer } = require('http');
-const { Server } = require("socket.io");
+const Server = require("socket.io");
 const socketioJwt = require('socketio-jwt');
 const cors = require('cors');
 require('./connections/mongodb');
@@ -13,7 +13,17 @@ const authRouter = require('./routes/auth');
 
 const app = express();
 const server = createServer(app);
+
 const io = new Server(server);
+
+// TODO: Socket.IO v4
+// const io = new Server(server, {
+//   cors: {
+//     origin: "http://localhost:8080",
+//     credentials: true
+//   },
+//   allowEIO3: true, // Support for Socket.IO v2 clients
+// });
 
 app.use(cors());
 app.use(express.json());
@@ -139,7 +149,14 @@ io.on('connection', async (socket) => {
    * USER CLOSE SESSION
    */
   socket.on('logout', async (username) => {
-    const rooms = io.sockets.sockets[socket.id].rooms;
+    // TODO: Change Socket.IO v4
+    /*
+    * https://socket.io/docs/v4/server-socket-instance/#disconnecting
+    */
+
+    // Main namespace: io.sockets, es simplemente un alias para io.of("/").
+    // io.sockets === io.of("/")
+    const rooms = io.sockets.sockets[socket.id].rooms; // deprecated in Socket.IO v3
 
     for (let room in rooms) {
       if (roomsUsers && roomsUsers[room]) {

@@ -154,7 +154,10 @@ const Rooms = {
    * @returns {Promise<void>}
    */
   leaveAllRooms: async (io, socket, username) => {
-    const rooms = io.sockets.sockets[socket.id].rooms;
+    // Main namespace: io.sockets, es simplemente un alias para io.of("/").
+    // io.sockets === io.of("/")
+    const rooms = io.sockets.sockets[socket.id].rooms; // deprecated in Socket.IO v3
+
     for (let room in rooms) {
       if (room !== 'live') {
         await socket.leave(room); // Abandonar sala
@@ -163,6 +166,11 @@ const Rooms = {
         });
       }
     }
+
+    // TODO: Change Socket.IO v4
+    /*
+    * https://socket.io/docs/v4/server-socket-instance/#disconnecting
+    */
   }
 };
 
