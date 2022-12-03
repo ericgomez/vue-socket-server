@@ -14,7 +14,7 @@ const Rooms = {
    * @returns {Promise<any>}
    */
   find: async () => {
-    return await Room.find().populate('owner').exec();
+    return await Room.find().populate('owner');
   },
   /**
    * CREATE A NEW ROOM
@@ -25,7 +25,7 @@ const Rooms = {
    */
   create: async (data, io, socket) => {
     const newRoom = new Room(data);
-    const dbRoom = await newRoom.save().then(model => model.populate('owner').execPopulate());
+    const dbRoom = await newRoom.save().then(model => model.populate('owner'));
 
     await io.in('live').emit('ROOMS_LOADED', { rooms: await Rooms.find() });
     await socket.broadcast.emit('NEW_ROOM_CREATED', { room: dbRoom });
